@@ -1,6 +1,7 @@
 package com.ibrawin.taskapi.controller;
 
-import com.ibrawin.taskapi.domain.Task;
+import com.ibrawin.taskapi.model.TaskRequest;
+import com.ibrawin.taskapi.model.TaskResponse;
 import com.ibrawin.taskapi.services.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,29 +27,29 @@ public class TaskController {
     private final TaskService taskService;
 
     @PostMapping(taskURL)
-    ResponseEntity<Task> createTask(@RequestBody Task task) {
-        Task newTask = taskService.saveTask(task);
+    ResponseEntity<TaskResponse> createTask(@RequestBody TaskRequest request) {
+        TaskResponse response = taskService.saveTask(request);
         return ResponseEntity
-                .created(URI.create(taskURL + newTask.getId()))
-                .body(task);
+                .created(URI.create(taskURL + response.id()))
+                .body(response);
     }
 
     @GetMapping(taskURL)
-    ResponseEntity<List<Task>> getAllTasks() {
+    ResponseEntity<List<TaskResponse>> getAllTasks() {
 
         return ResponseEntity
                 .ok(taskService.getTasks());
     }
 
     @GetMapping(taskIdURL)
-    ResponseEntity<Task> getTaskById(@PathVariable UUID id) {
+    ResponseEntity<TaskResponse> getTaskById(@PathVariable UUID id) {
 
         return ResponseEntity
                 .ok(taskService.getTaskById(id));
     }
 
     @PutMapping(taskIdURL)
-    ResponseEntity<Task> updateTaskById(@PathVariable UUID id, @RequestBody Task task) {
+    ResponseEntity<TaskResponse> updateTaskById(@PathVariable UUID id, @RequestBody TaskRequest task) {
 
         return ResponseEntity
                 .ok(taskService.updateTaskById(id, task));

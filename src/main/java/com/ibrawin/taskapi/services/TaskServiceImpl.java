@@ -1,10 +1,14 @@
 package com.ibrawin.taskapi.services;
 
 import com.ibrawin.taskapi.domain.Task;
+import com.ibrawin.taskapi.mapper.TaskMapper;
+import com.ibrawin.taskapi.model.TaskRequest;
+import com.ibrawin.taskapi.model.TaskResponse;
 import com.ibrawin.taskapi.repositories.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -14,29 +18,41 @@ import java.util.UUID;
 public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
-
+    private final TaskMapper taskMapper;
 
     @Override
-    public Task saveTask(Task task) {
-        return taskRepository.save(task);
+    public TaskResponse saveTask(TaskRequest request) {
+        Task task = taskMapper.taskRequestToTaskMapper(request);
+        task.setCreatedAt(LocalDateTime.now());
+        taskRepository.save(task);
+        return taskMapper.taskToTaskResponseMapper(task);
     }
 
     @Override
-    public List<Task> getTasks() {
-        return taskRepository.findAll();
+    public List<TaskResponse> getTasks() {
+        return taskRepository.findAll()
+                .stream()
+                .map(taskMapper::taskToTaskResponseMapper)
+                .toList();
     }
 
     @Override
-    public Task getTaskById(UUID id) {
-        return taskRepository.findById(id).orElseThrow(RuntimeException::new);
+    public TaskResponse getTaskById(UUID id) {
+        return taskRepository.findById(id)
+                .stream()
+                .map(taskMapper::taskToTaskResponseMapper)
+                .findFirst()
+                .orElseThrow(RuntimeException::new);
     }
 
     @Override
-    public Task updateTaskById(UUID id, Task task) {
+    public TaskResponse updateTaskById(UUID id, TaskRequest request) {
         Optional<Task> oldTask = taskRepository.findById(id);
         if (oldTask.isPresent()) {
-            task.setId(id);
-            return taskRepository.save(task);
+            Task newTask = taskMapper.taskRequestToTaskMapper(request);
+            newTask.setId(id);
+            newTask.setCreatedAt(oldTask.get().getCreatedAt());
+            return taskMapper.taskToTaskResponseMapper(taskRepository.save(newTask));
         }
         throw new RuntimeException();
     }

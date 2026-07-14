@@ -21,41 +21,41 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TaskController {
 
-    private static final String taskURL = "/api/task";
-    private static final String taskIdURL = taskURL + "/{id}";
+    public static final String TASK_URL = "/api/task";
+    public static final String TASK_ID_URL = TASK_URL + "/{id}";
 
     private final TaskService taskService;
 
-    @PostMapping(taskURL)
+    @PostMapping(TASK_URL)
     ResponseEntity<TaskResponse> createTask(@RequestBody TaskRequest request) {
         TaskResponse response = taskService.saveTask(request);
         return ResponseEntity
-                .created(URI.create(taskURL + response.id()))
+                .created(URI.create(TASK_URL + response.id()))
                 .body(response);
     }
 
-    @GetMapping(taskURL)
+    @GetMapping(TASK_URL)
     ResponseEntity<List<TaskResponse>> getAllTasks() {
 
         return ResponseEntity
                 .ok(taskService.getTasks());
     }
 
-    @GetMapping(taskIdURL)
+    @GetMapping(TASK_ID_URL)
     ResponseEntity<TaskResponse> getTaskById(@PathVariable UUID id) {
 
         return ResponseEntity
                 .ok(taskService.getTaskById(id));
     }
 
-    @PutMapping(taskIdURL)
+    @PutMapping(TASK_ID_URL)
     ResponseEntity<TaskResponse> updateTaskById(@PathVariable UUID id, @RequestBody TaskRequest task) {
 
         return ResponseEntity
                 .ok(taskService.updateTaskById(id, task));
     }
 
-    @DeleteMapping(taskIdURL)
+    @DeleteMapping(TASK_ID_URL)
     ResponseEntity<Void> deleteTaskById(@PathVariable UUID id) {
         taskService.deleteTaskById(id);
 

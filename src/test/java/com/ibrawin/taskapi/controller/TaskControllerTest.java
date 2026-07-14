@@ -1,5 +1,6 @@
 package com.ibrawin.taskapi.controller;
 
+import com.ibrawin.taskapi.exceptions.NotFoundException;
 import com.ibrawin.taskapi.model.TaskRequest;
 import com.ibrawin.taskapi.model.TaskResponse;
 import com.ibrawin.taskapi.services.TaskService;
@@ -44,6 +45,9 @@ class TaskControllerTest {
 
     @Autowired
     MockMvc mockMvc;
+
+    @Captor
+    ArgumentCaptor<UUID> uuidArgumentCaptor;
 
     @Captor
     ArgumentCaptor<TaskRequest> taskRequestArgumentCaptor;
@@ -108,7 +112,31 @@ class TaskControllerTest {
     }
 
     @Test
-    void getTaskById() {
+    void getTaskByIdFound() throws Exception {
+
+        given(taskService.getTaskById(any(UUID.class)))
+                .willReturn(taskResponse);
+
+        mockMvc.perform(get(TaskController.TASK_ID_URL, taskResponse.id())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id", is(taskResponse.id().toString())));
+
+        verify(taskService).getTaskById(uuidArgumentCaptor.capture());
+        assertThat(uuidArgumentCaptor.getValue()).isEqualTo(taskResponse.id());
+
+    }
+
+    @Test
+    void getTaskByIdNotFound() throws Exception {
+
+        given(taskService.getTaskById(any(UUID.class)))
+                .willThrow(NotFoundException.class);
+
+        mockMvc.perform(get(TaskController.TASK_ID_URL, UUID.randomUUID())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
     @Test

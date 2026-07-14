@@ -1,6 +1,7 @@
 package com.ibrawin.taskapi.services;
 
 import com.ibrawin.taskapi.domain.Task;
+import com.ibrawin.taskapi.exceptions.NotFoundException;
 import com.ibrawin.taskapi.mapper.TaskMapper;
 import com.ibrawin.taskapi.model.TaskRequest;
 import com.ibrawin.taskapi.model.TaskResponse;
@@ -42,7 +43,7 @@ public class TaskServiceImpl implements TaskService {
                 .stream()
                 .map(taskMapper::taskToTaskResponseMapper)
                 .findFirst()
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(NotFoundException::new);
     }
 
     @Override
@@ -54,7 +55,7 @@ public class TaskServiceImpl implements TaskService {
             newTask.setCreatedAt(oldTask.get().getCreatedAt());
             return taskMapper.taskToTaskResponseMapper(taskRepository.save(newTask));
         }
-        throw new RuntimeException();
+        throw new NotFoundException();
     }
 
     @Override

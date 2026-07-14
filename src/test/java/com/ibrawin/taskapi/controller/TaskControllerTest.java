@@ -1,6 +1,5 @@
 package com.ibrawin.taskapi.controller;
 
-import com.ibrawin.taskapi.mapper.TaskMapperImpl;
 import com.ibrawin.taskapi.model.TaskRequest;
 import com.ibrawin.taskapi.model.TaskResponse;
 import com.ibrawin.taskapi.services.TaskService;
@@ -35,9 +34,6 @@ class TaskControllerTest {
 
     @MockitoBean
     TaskService taskService;
-
-    @Autowired
-    TaskMapperImpl taskMapper;
 
     @Autowired
     ObjectMapper objectMapper;

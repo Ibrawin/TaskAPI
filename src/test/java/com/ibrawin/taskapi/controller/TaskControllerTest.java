@@ -17,12 +17,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -76,7 +80,31 @@ class TaskControllerTest {
     }
 
     @Test
-    void getAllTasks() {
+    void getAllTasks() throws Exception {
+
+        given(taskService.getTasks())
+                .willReturn(List.of(
+                        taskResponse,
+                        new TaskResponse(UUID.randomUUID(), "Clean House", "Fleaning the house thoroughly", false, LocalDateTime.now())));
+
+        mockMvc.perform(get(TaskController.TASK_URL)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.length()", is(2)));
+    }
+
+    @Test
+    void getEmptyTasks() throws Exception {
+
+        given(taskService.getTasks())
+                .willReturn(Collections.emptyList());
+
+        mockMvc.perform(get(TaskController.TASK_URL)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.length()", is(0)));
     }
 
     @Test

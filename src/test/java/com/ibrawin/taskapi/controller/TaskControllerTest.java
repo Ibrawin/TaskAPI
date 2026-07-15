@@ -26,7 +26,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willThrow;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -173,6 +176,28 @@ class TaskControllerTest {
     }
 
     @Test
-    void deleteTaskById() {
+    void deleteTaskByIdFound() throws Exception {
+
+        UUID id = UUID.randomUUID();
+
+        mockMvc.perform(delete(TaskController.TASK_ID_URL, id)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+
+        verify(taskService, times(1)).deleteTaskById(uuidArgumentCaptor.capture());
+        assertThat(uuidArgumentCaptor.getValue()).isEqualTo(id);
+    }
+
+    @Test
+    void deleteTaskByIdNotFound() throws Exception {
+
+        UUID id = UUID.randomUUID();
+
+        willThrow(NotFoundException.class)
+                .given(taskService).deleteTaskById(any(UUID.class));
+
+        mockMvc.perform(delete(TaskController.TASK_ID_URL, id)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 }

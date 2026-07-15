@@ -29,6 +29,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -140,7 +141,35 @@ class TaskControllerTest {
     }
 
     @Test
-    void updateTaskById() {
+    void updateTaskByIdFound() throws Exception {
+
+        given(taskService.updateTaskById(any(UUID.class), any(TaskRequest.class)))
+                .willReturn(taskResponse);
+
+        mockMvc.perform(put(TaskController.TASK_ID_URL, taskResponse.id())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(taskRequest)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").exists());
+//                .andExpect(jsonPath("$.createdAt", is(taskResponse.createdAt().toString())));
+
+        verify(taskService).updateTaskById(uuidArgumentCaptor.capture(), taskRequestArgumentCaptor.capture());
+        assertThat(uuidArgumentCaptor.getValue()).isEqualTo(taskResponse.id());
+    }
+
+    @Test
+    void updateTaskByIdNotFound() throws Exception {
+
+        given(taskService.updateTaskById(any(UUID.class), any(TaskRequest.class)))
+                .willThrow(NotFoundException.class);
+
+        mockMvc.perform(put(TaskController.TASK_ID_URL, UUID.randomUUID())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(taskRequest)))
+                .andExpect(status().isNotFound());
     }
 
     @Test

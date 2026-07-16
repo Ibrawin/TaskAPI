@@ -8,7 +8,7 @@ import org.mapstruct.Mapper;
 @Mapper
 public interface TaskMapper {
 
-    Task taskRequestToTaskMapper(TaskRequest request);
+    Task toTask(TaskRequest request);
 
-    TaskResponse taskToTaskResponseMapper(Task task);
+    TaskResponse toTaskResponse(Task task);
 }

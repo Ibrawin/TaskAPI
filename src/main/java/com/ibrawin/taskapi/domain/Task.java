@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "Task")
+@Table(name = "task")
 @Data
 public class Task {
 

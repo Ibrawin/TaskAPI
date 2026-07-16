@@ -88,6 +88,20 @@ class TaskControllerTest {
     }
 
     @Test
+    void createTaskWithBlankTitle() throws Exception {
+        TaskRequest invalidRequest = new TaskRequest("", "description", false);
+
+        mockMvc.perform(post(TaskController.TASK_URL)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("Validation failed"));
+    }
+
+
+    @Test
     void getAllTasks() throws Exception {
 
         given(taskService.getTasks())
@@ -173,6 +187,19 @@ class TaskControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(taskRequest)))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updateTaskWithBlankTitle() throws Exception {
+        TaskRequest invalidRequest = new TaskRequest("", "description", false);
+
+        mockMvc.perform(put(TaskController.TASK_ID_URL, UUID.randomUUID())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("Validation failed"));
     }
 
     @Test

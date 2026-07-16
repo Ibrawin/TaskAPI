@@ -63,10 +63,10 @@ public class TaskServiceImpl implements TaskService {
     @Override
     @Transactional
     public void deleteTaskById(UUID id) {
-        if (taskRepository.existsById(id)) {
-            taskRepository.deleteById(id);
+        if (!taskRepository.existsById(id)) {
+            throw new NotFoundException();
         }
 
-        throw new NotFoundException();
+        taskRepository.deleteById(id);
     }
 }

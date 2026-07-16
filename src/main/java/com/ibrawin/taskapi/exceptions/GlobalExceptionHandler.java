@@ -1,7 +1,5 @@
-package com.ibrawin.taskapi.controller;
+package com.ibrawin.taskapi.exceptions;
 
-import com.ibrawin.taskapi.exceptions.ApiError;
-import com.ibrawin.taskapi.exceptions.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -29,5 +27,11 @@ public class GlobalExceptionHandler {
                 .toList();
 
         return new ApiError(HttpStatus.BAD_REQUEST.value(), "Validation failed", errors);
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiError handleGeneral(Exception ex) {
+        return new ApiError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An unexpected error occurred");
     }
 }

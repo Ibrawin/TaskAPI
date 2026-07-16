@@ -42,19 +42,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class TaskControllerTest {
 
     @MockitoBean
-    TaskService taskService;
+    private TaskService taskService;
 
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
     @Autowired
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
 
     @Captor
-    ArgumentCaptor<UUID> uuidArgumentCaptor;
+    private ArgumentCaptor<UUID> uuidArgumentCaptor;
 
     @Captor
-    ArgumentCaptor<TaskRequest> taskRequestArgumentCaptor;
+    private ArgumentCaptor<TaskRequest> taskRequestArgumentCaptor;
 
     private TaskRequest taskRequest;
 
